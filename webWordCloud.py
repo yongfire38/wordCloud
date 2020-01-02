@@ -7,11 +7,18 @@ from urllib.parse import quote
 #형태소 분석해 주는 라이브러리
 from konlpy.tag import Okt
 from konlpy.corpus import kolaw
+#태그 클라우드
+import pytagcloud
+#개수를 세 주기 위해
+from collections import Counter
+#화면 출력
+import matplotlib.pyplot as plt
+import matplotlib.image as mpimg
 
 #검색할 문자열과 검색할 기사 개수 및 텍스트를 저장할 파일명을 입력받기
-keyword = input("검색어:")
-page_num = int(input("기사 개수(곱하기 3):"))
-output_filename = input("저장할 파일명:")
+keyword = input("keyword:")
+page_num = int(input("page_num(x3):"))
+output_filename = input("save_file_name:")
 
 #텍스트를 저장할 파일 객체 만들기
 output_file = open(output_filename, 'w', encoding='utf-8')
@@ -48,8 +55,21 @@ output_file.close()
 f = open(output_filename, 'r', encoding='utf-8')
 data = f.read()
 #print(data)
-#형태소 분석기 생성
 
+#형태소 분석기 생성
 nlp = Okt()
 nouns = nlp.nouns(data)
-print(nouns)
+#print(nouns)
+
+#개수 세기
+count = Counter(nouns)
+tag2 = count.most_common(50)
+#글자 크기 설정
+taglist = pytagcloud.make_tags(tag2, maxsize=100)
+#그림 만들기
+pytagcloud.create_tag_image(taglist, 'wordcloud.png', size=(900,600), fontname='Korean')
+f.close()
+#화면 출력
+img = mpimg.imread('wordcloud.png')
+plt.imshow(img)
+plt.show()
